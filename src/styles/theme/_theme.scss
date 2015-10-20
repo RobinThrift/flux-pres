@@ -1,0 +1,20 @@
+@import 'reveal/reveal';
+
+
+@import 'reveal/template/_mixins';
+@import 'reveal/template/_settings';
+
+@import '../_vars';
+
+$mainColor: $main-font;
+$headingColor: $mainColor;
+
+$headingTextShadow: none;
+$heading1TextShadow: none;
+
+$headingFont: $header-font;
+
+$linkColor: $main;
+$linkColorHover: $main-light;
+
+@import 'reveal/template/_theme';
