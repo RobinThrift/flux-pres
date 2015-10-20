@@ -1,6 +1,6 @@
 - What is Flux
-    - What are the problems with other patterns?
     - What does Flux solve?
+        - What are the problems with other patterns?
     - What does Flux **not** solve
 - Flux Fundamentals
     - Overview Diagram

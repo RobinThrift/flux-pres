@@ -34,6 +34,10 @@ reveal:
 
 --
 
+### "Application Architecture for Building [emphasize]User Interfaces[/emphasize]"
+
+--
+
 ### What is Flux trying to solve?
 
 --
@@ -59,6 +63,25 @@ reveal:
 }
 
 ![img/mvc3-2.svg](img/mvc3-2.svg)
+
+
+-- {
+    transition: 'slide-in none-out'
+}
+
+![img/chat-0.svg](img/chat-0.svg)
+
+-- {
+    transition: fade
+}
+
+![img/chat-1.svg](img/chat-1.svg)
+
+-- {
+    transition: 'none-in slide-out'
+}
+
+![img/chat-2.svg](img/chat-2.svg)
 
 --
 
@@ -123,3 +146,95 @@ interface Store<T> {
     private notifyViews(): void;
 }
 ```
+
+--
+
+```typescript
+class UserStore extends Store<User[]> {
+    // ...
+    dispatch(payload: Payload) {
+        switch (payload.actionType) {
+            case 'ADD_USER':
+                // ...
+            break;
+            case: 'UPDATE_USER':
+                // ...
+            break;
+        }
+    }
+    // ...
+}
+```
+
+[fragment]
+```typescript
+import dispatcher from './localDispatcher';
+let userStore = new UserStore();
+dispatcher.register(userStore.dispatch);
+```
+[/fragment]
+
+-- {
+    transition: 'slide-in none-out'
+}
+
+"[...] stores accept updates and reconcile them as appropriate [...]"
+
+[fragment]
+"[...] Stores have no direct setter methods [...], but instead have only a single way of getting new data into their self-contained world."
+[/fragment]
+
+<hr />
+
+[small][https://facebook.github.io/flux/docs/overview.html](https://facebook.github.io/flux/docs/overview.html)[/small]
+
+-- {
+    transition: 'none-in slide-out'
+}
+
+"[...] stores accept updates and reconcile them as appropriate [...]"
+
+"[...] Stores have no direct setter methods [...], but instead have only a single way of getting new data into their [emphasize]self-contained world[/emphasize]."
+
+<hr />
+
+[small][https://facebook.github.io/flux/docs/overview.html](https://facebook.github.io/flux/docs/overview.html)[/small]
+
+--
+
+## [colour hex=4A4A4A]Views[/colour]
+![img/views-0.svg](img/views-0.svg)
+
+--
+
+```javascript
+class AutoComplete extends React.Component {
+    _handleChange(event) {
+        let {value} = event.target;
+        this.setState({value});
+        autoCompleteActions.createListForValue(value);
+    }
+    onStoreUpdate(oldState, newState) {
+        this.setState({suggestions: newState});
+    }
+    render() {
+        // next slide
+    }
+}
+```
+
+--
+
+<pre><code class="lang-typescript">render() {
+    <span class="hljs-keyword">return</span> (
+        &lt;input <span class="hljs-keyword">type</span>=<span class="hljs-string">"text"</span> 
+               value={<span class="hljs-keyword">this</span>.state.value} 
+               onChange={<span class="hljs-keyword">this</span>._handleChange.bind(<span class="hljs-keyword">this</span>)} /&gt;
+        &lt;ul&gt;  
+            {<span class="hljs-keyword">this</span>.state.suggestions.map((s) =&gt; {
+                <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">li</span>&gt;</span>{s}<span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>;</span>
+            })}
+        &lt;/ul&gt;  
+    );
+}
+</code></pre>

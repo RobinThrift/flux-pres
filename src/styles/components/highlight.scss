@@ -72,7 +72,7 @@ $grue: #009999;
     .highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
 
     .hljs-params, .hljs-built_in { color: $purple; }
-    .hljs-title, .hljs-keyword { color: $grue; }
+    .hljs-keyword { color: $grue; }
     .hljs-attribute { color: $green; }
 
     .hljs-function > .hljs-keyword { color: $green; }
