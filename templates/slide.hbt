@@ -5,6 +5,7 @@
     {{#if background.size}} data-background-size="{{background.size}}" {{/if}}
     {{#if background.position}} data-background-position="{{background.position}}" {{/if}}
     {{#if transition}} data-transition="{{transition}}" {{/if}}
+    {{#if notes}} data-notes="{{notes}}" {{/if}}
 >
     {{{ contents }}}
 </section> 

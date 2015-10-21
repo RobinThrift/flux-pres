@@ -19,7 +19,8 @@
             {{/each}}
             </div>
         </div>
-
+    
+        <script src="scripts/head.min.js"></script>
         <script src="scripts/reveal.js"></script>
         <script>
         Reveal.initialize({{{json config.reveal}}});
