@@ -1,15 +1,15 @@
 - What is Flux
-    - What does Flux solve?
-        - What are the problems with other patterns?
+    - What does Flux solve? x
+        - What are the problems with other patterns? x
     - What does Flux **not** solve
 - Flux Fundamentals
-    - Overview Diagram
-    - Dispatcher
-    - Stores
-    - Views
+    - Overview Diagram x
+    - Dispatcher x
+    - Stores x
+    - Views x
     - Actions
-        - ActionTypes and Payloads
-        - What the Flux are Actions?
+        - ActionTypes x
+        - What the Flux are Actions? x
 - Flux in the Wild
-    - Many, many implementations
-    - Why and how do they differ?
+    - Many, many implementations x
+    - Why and how do they differ? x

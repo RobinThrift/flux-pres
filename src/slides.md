@@ -14,10 +14,15 @@ reveal:
     overview: true
     transition: 'linear'
     backgroundTransition: 'slide'
+    showNotes: true
+    dependencies:
+        - src: 'scripts/plugins/notes.js'
+          async: true
 
 -- {
     background: 
         img: '#cb5243'
+    notes: 'Or, a more important phylosophical question:'
 }
 
 # [var title]
@@ -96,13 +101,13 @@ reveal:
 
 ```typescript
 interface Dispatcher {
-    register(fn: (payload: Payload) => void): void;
-    dispatch(payload: Payload): void;
+    register(fn: (action: Action) => void): void;
+    dispatch(action: Action): void;
 }
 ```
 
 ```typescript
-type Payload = {
+type Action = {
     actionType: Symbol,
     data: any
 }
@@ -120,7 +125,11 @@ type Payload = {
 
 ![img/dispatcher-2.svg](img/dispatcher-2.svg)
 
--- 
+--  {
+    notes: |
+        - Stores many objects, not just one, like a model in MVC
+        - single domain
+}
 
 ## [colour hex=74299F]Stores[/colour]
 ![img/stores-0.svg](img/stores-0.svg)
@@ -131,7 +140,7 @@ type Payload = {
 
 ```typescript
 interface Store {
-    dispatch(payload: Payload): void;
+    dispatch(action: Action): void;
 }
 ```
 
@@ -141,7 +150,7 @@ interface Store {
 
 ```typescript
 interface Store<T> {
-    public dispatch(payload: Payload): void;
+    public dispatch(action: Action): void;
     public registerView(fn: (oldState: T, newState: T) => void): void;
     private notifyViews(): void;
 }
@@ -152,8 +161,8 @@ interface Store<T> {
 ```typescript
 class UserStore extends Store<User[]> {
     // ...
-    dispatch(payload: Payload) {
-        switch (payload.actionType) {
+    dispatch(action: Action) {
+        switch (action.actionType) {
             case 'ADD_USER':
                 // ...
             break;
@@ -207,24 +216,6 @@ dispatcher.register(userStore.dispatch);
 
 --
 
-```javascript
-class AutoComplete extends React.Component {
-    _handleChange(event) {
-        let {value} = event.target;
-        this.setState({value});
-        autoCompleteActions.createListForValue(value);
-    }
-    onStoreUpdate(oldState, newState) {
-        this.setState({suggestions: newState});
-    }
-    render() {
-        // next slide
-    }
-}
-```
-
---
-
 <pre><code class="lang-typescript">render() {
     <span class="hljs-keyword">return</span> (
         &lt;input <span class="hljs-keyword">type</span>=<span class="hljs-string">"text"</span> 
@@ -238,3 +229,185 @@ class AutoComplete extends React.Component {
     );
 }
 </code></pre>
+
+-- {
+    notes: |
+        - but, not quite the React way
+}
+
+```javascript
+class AutoComplete extends React.Component {
+    _handleChange(event) {
+        let {value} = event.target;
+        this.setState({value});
+        autoCompleteActions.createListForValue(value);
+    }
+    onStoreUpdate(oldState, newState) {
+        this.setState({suggestions: newState});
+    }
+    render() {
+        // prev slide
+    }
+}
+```
+
+-- {
+    notes: hands state down to children
+}
+
+```javascript
+<ConnectToStores stores={[StoreA, StoreB]}>
+    <AutoComplete />
+</ConnectToStores>
+```
+
+-- {
+    notes: |
+        - Actions are central to flux
+        - they propagate through the system
+        - carrying interactions/data
+        - are quite difficult
+}
+
+## [colour hex=EE6E45]Actions[/colour]
+![img/actions-0.svg](img/actions-0.svg)
+
+-- 
+
+```typescript
+type Action = {
+    actionType: Symbol,
+    data: any
+}
+```
+
+-- {
+    notes: But, if action in more than 1 view, this is tedious
+}
+
+```typescript
+let myAction = {
+    actionType: UPDATE_STUFF,
+    data: 'Hello World'
+};
+
+dispatcher.dispatch(myAction);
+```
+
+-- {
+    notes: |
+        - Helper functions
+        - wrap actions
+}
+
+### Action Creators
+```typescript
+function updateStuff(data) {
+    dispatcher.dispatch({
+        actionType: UPDATE_STUFF,
+        data: data
+    });
+}
+
+// ... somewhere down the line
+updateStuff('Hello World');
+```
+
+-- {
+    notes: |
+        - type safety
+        - usage of constants
+}
+
+### Action Types
+
+```typescript
+const types = {
+    TYPE_A: Symbol(), // ES6/2015,
+    TYPE_B: 'TYPE_B' // ES5
+};
+
+// TypeScript
+enum types = {
+    TYPE_A,
+    TYPE B
+};
+```
+
+-- {
+    notes: |
+        - strings are unsafe
+}
+
+### Constants
+
+```
+src/
+├── dispatcher.js
+├── actions/
+├── constants/
+│   └── todos.js
+└── components/
+```
+
+[fragment]
+```typescript
+export const TODO_CONSTANTS = {
+    ADD_TODO: Symbol(), // ES6/2015
+    UPDATE_TODO: 'UPDATE_TODO' // ES5
+};
+```
+[/fragment]
+
+--
+
+```typescript
+import TODO_CONSTANTS from '../constants/todos';
+function updateTodo(todo) {
+    dispatcher.dispatch({
+        actionType: TODO_CONSTANTS.UPDATE_TODO,
+        data: todo
+    });
+}
+
+// in a store
+dispatch(action: Action) {
+    switch (action.actionType) {
+        case TODO_CONSTANTS.ADD_TODO: // ...
+        break;
+        case: TODO_CONSTANTS.UPDATE_TODO: // ...
+        break;
+    }
+}
+```
+
+--
+
+### What does Flux **not** solve?
+[fragment]
+## Data Retrieval
+[/fragment]
+
+--
+
+## Flux in the wild
+[fragment]
+- it's just a pattern
+[/fragment]
+[fragment]
+- many, many implementations
+[/fragment]
+[fragment]
+- some isomorphic
+[/fragment]
+[fragment]
+- some OO
+[/fragment]
+[fragment]
+- some functional
+[/fragment]
+
+--
+
+### Cool Stuff You Can Do With Flux (CSYCDWF)
+- undo history (almost for free)
