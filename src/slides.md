@@ -211,6 +211,74 @@ dispatcher.register(userStore.dispatch);
 
 --
 
+### Stores in Veer
+
+
+```typescript
+class Store<T> {
+    constructor(dispatcher) {
+        // ...
+        this.bindings = {
+            // ...
+        }
+    }
+    
+    private setState(newState: T) {
+        // ...
+    }
+
+    public subscribe(sub) {
+        // ...
+    }
+}
+```
+
+--
+
+### Veer store bindings
+
+```typescript
+this.bindings = {
+    [CONSTANT]: this.someMethod.bind(this)
+}
+
+// in store class
+set bindings(newBindings) {
+    this._bindings = new Map(newBindings);
+}
+
+
+dispatch({actionType, data}) {
+    if (this._bindings.has(actionType)) {
+        this._bindings.get(actionType)(data);
+    }
+}
+```
+
+--
+
+```javascript
+import {Store} from 'veer/dist/store';
+import {SubredditConstants} from '../constants/subreddits';
+
+export class SubredditStore extends Store {
+    constructor(dispatcher) {
+        super(dispatcher);
+        this.setState([]);
+        this.bindings = {
+            [SubredditConstants.GET_USER_SUBREDDITS]: 
+                this.takeDataAsIs.bind(this)
+        };
+    }
+
+    takeDataAsIs(data) {
+        this.setState(data);
+    }
+}
+```
+
+--
+
 ## [colour hex=4A4A4A]Views[/colour]
 ![img/views-0.svg](img/views-0.svg)
 
@@ -259,6 +327,54 @@ class AutoComplete extends React.Component {
 <ConnectToStores stores={[StoreA, StoreB]}>
     <AutoComplete />
 </ConnectToStores>
+```
+
+--
+
+#### Connection views and stores in Veer
+
+```javascript
+<ConnectToStores stores={{storeAState: storeAInstance}}>
+    <OtherComponent />
+</ConnectToStores>
+```
+
+`ConnectToStores` hands down the `stores` as idividual props and
+handles the updates.
+
+--
+
+```javascript
+import React, {Component} from 'react-native';
+import {ConnectToStores} from 'veer/dist/components/connectToStores';
+import {SubredditStore} from '../stores/subreddits';
+import {SubredditList} from './SubredditList/index';
+
+export class UserSubreddits extends Component {
+    render() {
+        let stores = {
+            subreddits: SubredditStore.getDefaultInstance()
+        };
+        return (
+            <ConnectToStores stores={stores}>
+                <SubredditList {...this.props} />
+            </ConnectToStores>
+        );
+    }
+}
+```
+
+--
+
+
+```javascript
+export class SubredditList extends Component {
+    // ...
+    componentWillReceiveProps(nextProps) {
+        // ...
+    }
+    // ...
+}
 ```
 
 -- {
@@ -383,31 +499,55 @@ dispatch(action: Action) {
 
 --
 
-### What does Flux **not** solve?
-[fragment]
-## Data Retrieval
-[/fragment]
+### Constants in Veer
+
+```javascript
+import constantCreator from 'veer/dist/constantCreator';
+export const SubredditConstants = constantCreator([
+    'GET_USER_SUBREDDITS',
+    'GET_SUBREDDIT_LISTING'
+]);
+```
 
 --
 
-## Flux in the wild
-[fragment]
-- it's just a pattern
-[/fragment]
-[fragment]
-- many, many implementations
-[/fragment]
-[fragment]
-- some isomorphic
-[/fragment]
-[fragment]
-- some OO
-[/fragment]
-[fragment]
-- some functional
-[/fragment]
+### Actions in Veer
+
+```typescript
+export const subredditActions = {
+    getUserSubreddits() {
+        // ...
+        dispatcher.dispatch({
+            actionType: SubredditConstants.GET_USER_SUBREDDITS,
+            data: SOME_DATA
+        });
+    }
+};
+```
 
 --
 
-### Cool Stuff You Can Do With Flux (CSYCDWF)
-- undo history (almost for free)
+### Where to call actions?
+
+```javascript
+export class PostList extends Component {
+    componentWillReceiveProps(nextProps) {
+        this.setState({posts: nextProps.posts});
+    }
+    componentDidMount() {
+        subredditActions
+            .getSubredditListing(this.props.name, this.props.after);
+    }
+    onEndReached() {
+        let last = this.state.posts.pop().id;
+        subredditActions
+            .getSubredditListing(this.props.name, last);
+    }
+    render() {
+        return (
+            <ListView
+                onEndReached={this.onEndReached.bind(this)}
+                ... />
+        );
+    }
+```
